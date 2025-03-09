@@ -2,7 +2,6 @@ package prices
 
 import (
 	"fmt"
-	"strconv"
 
 	conversion "example.com/price-calculator/coversion"
 	filemanager "example.com/price-calculator/filemanager"
@@ -11,7 +10,7 @@ import (
 type TaxIncludedPriceJob struct {
 	TaxRate           float64
 	InputPrices       []float64
-	TaxIncludedPrices map[string]float64
+	TaxIncludedPrices map[string]string
 }
 
 func (job *TaxIncludedPriceJob) LoadData() {
@@ -37,14 +36,15 @@ func (job *TaxIncludedPriceJob) Process() {
 
 	job.LoadData()
 
-	result := make(map[string]float64)
+	result := make(map[string]string)
 	for _, price := range job.InputPrices {
 		taxIncludedPrice := price * (1 + job.TaxRate)
-		resultPrice, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", taxIncludedPrice), 64)
-		result[fmt.Sprintf("%.2f", price)] = resultPrice
+		result[fmt.Sprintf("%.2f", price)] = fmt.Sprintf("%.2f", taxIncludedPrice)
 	}
 
-	fmt.Println(result)
+	job.TaxIncludedPrices = result
+
+	filemanager.WriteJSON(fmt.Sprintf("result_%.0f.json", job.TaxRate*100), job)
 }
 
 func NewTaxIncludedPriceJob(taxRate float64) *TaxIncludedPriceJob {
