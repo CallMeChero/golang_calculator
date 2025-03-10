@@ -17,9 +17,10 @@ func (fm FileManager) ReadLines() ([]string, error) {
 	file, err := os.Open(fm.InputFilePath)
 
 	if err != nil {
-		file.Close()
 		return nil, errors.New("Failed to open file")
 	}
+
+	defer file.Close() /// kada zavrsi scope funckije ce napravit file close
 
 	scanner := bufio.NewScanner(file)
 
@@ -32,11 +33,9 @@ func (fm FileManager) ReadLines() ([]string, error) {
 	err = scanner.Err()
 
 	if err != nil {
-		file.Close()
 		return nil, errors.New("An error occured while reading file")
 	}
 
-	file.Close()
 	return lines, nil
 }
 
@@ -46,6 +45,7 @@ func (fm FileManager) WriteResult(data interface{}) error {
 	if err != nil {
 		return errors.New("Failed to create file")
 	}
+	defer file.Close() /// kada zavrsi scope funckije ce napravit file close
 
 	time.Sleep(3 * time.Second)
 
@@ -53,11 +53,11 @@ func (fm FileManager) WriteResult(data interface{}) error {
 	err = encoder.Encode(data)
 
 	if err != nil {
-		file.Close()
+		// file.Close()
 		return errors.New("Failed to convert data in JSON")
 	}
 
-	file.Close()
+	// file.Close()
 	return nil
 }
 
